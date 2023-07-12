@@ -1,0 +1,25 @@
+﻿
+input[type=text]:focus {
+    color: #000;
+    background-color: white;
+    border: 2px solid #FF385C;
+    outline: 0;
+    box-shadow: none;
+}
+
+input[type=text] {
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+label {
+    margin-bottom: 10px;
+    display: block;
+}
+
+.btn-danger{
+    position:center;
+}

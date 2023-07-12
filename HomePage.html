@@ -1,0 +1,345 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+
+    
+    <script src="amsterdam.js"></script>
+
+    <link href="HomePageSTYLE.css" rel="stylesheet" />
+
+    <script>
+        console.log(amsterdam);
+        //אתחול
+        function initAfterRegistration() {
+            cgroup57 = JSON.parse(localStorage["cgroup57"]);
+            cgroup57_login = JSON.parse(localStorage["cgroup57_login"]);
+
+            roomSearch();
+
+        }
+
+        function minFunc() {
+            Min = document.getElementById("min-price").value;
+            let str = "<b> Min price: " + Min + " $</b>";
+            document.getElementById("mindiv").innerHTML = str;
+        }
+
+        function maxFunc() {
+            Max = document.getElementById("max-price").value;
+            let str = "<b> Max price: " + Max + " $ </b>";
+            document.getElementById("maxdiv").innerHTML = str;
+        }
+
+        function rateFunc() {
+            Rate = document.getElementById("rate").value;
+        }
+
+        function roomsFunc() {
+            Rooms = document.getElementById("rooms").value;
+        }
+
+        //פונקציה שמציגה באופן דינאמי את מספר החדרים
+        function roomSearch() {
+            let roomstr = "";
+            roomstr += '<select class="custom-select mb-3 col" name="rooms" id="rooms" onchange="roomsFunc()">';
+            roomstr += '<option  value="-1">Select</option>';
+            roomsArr = [];
+
+            for (var i = 0; i < amsterdam.length; i++) {
+                roomsArr[i] = amsterdam[i].bedrooms;
+            }
+
+            roomsArr.sort();
+            Num = 0;
+            for (var j = 0; j < roomsArr.length; j++) {
+                if (roomsArr[j] > Num) {
+                    roomstr += '<option value="' + roomsArr[j] + '">' + roomsArr[j] + '</option>';
+                    Num = roomsArr[j];
+                }
+            }
+            roomstr += '</select>';
+
+
+            document.getElementById("roomsdiv").innerHTML += roomstr;
+
+
+        }
+
+        //פונקציה שמציגה באופן דינאמי את החדרים על פי סינון של המשתמש
+        function render() {
+            let roomNum = 0;
+
+            document.getElementById("showRooms").innerHTML = "";
+            var Min = document.getElementById("min-price").value;
+            var Max = document.getElementById("max-price").value;
+            var Rate = document.getElementById("rate").value;
+            var Rooms = document.getElementById("rooms").value;
+
+            var startDate = document.getElementById("startDate").value;
+            var endDate = document.getElementById("endDate").value;
+
+
+            var today = new Date();
+            var day = "";
+            var month = "";
+
+            if (today.getMonth()+1  < 10) {
+                month = "0"
+                month+=today.getMonth() + 1;
+
+            }
+            if (today.getDate() < 10) {
+                day = "0" + today.getDate();
+
+            }
+            today = today.getFullYear() + '-' + month + '-' + day;
+           
+            cgroup57_login.startDate = startDate;
+            cgroup57_login.endDate = endDate;
+            localStorage["cgroup57_login"] = JSON.stringify(cgroup57_login);
+
+
+
+            if (Rate == -1 || Rooms == -1 || startDate == "" || endDate == "") {
+                alert("Please enter values to all filters");
+            }
+            else if (endDate <= startDate || startDate < today) {
+                alert("Oops, the dates you entered are invalid");
+            }
+            else  {
+                for(var i = 0; i<amsterdam.length; i++) {
+                    if (AvailbleDates(amsterdam[i].id, startDate, endDate) == 0) {
+                        if (amsterdam[i].review_scores_value >= Rate) {
+                            if (amsterdam[i].bedrooms == Rooms) {
+                                if (Min < Max) {
+                                    if (parseFloat(amsterdam[i].price.slice(1).replace(',', '')) <= Max && parseFloat(amsterdam[i].price.slice(1).replace(',', '')) >= Min) {
+                                        let str = "<div class='airbnb col-12'>";
+                                        str += "<div class='col-12'>"
+                                        str += "<div><h2>" + amsterdam[i].name + "</h2>";
+                                        str += `<img src='` + amsterdam[i].picture_url + `'class="roomImg"/>`;
+                                        str += "</div>";
+                                        str += "<div>";
+                                        str += "Asset's id is " + amsterdam[i].id;
+                                        str += "</div>";
+                                        str += "<div>";
+                                        str += '<a href="' + amsterdam[i].listing_url + '"+ target=`_blank`>';
+                                        str += " Asset's website ";
+                                        str += '</a>';
+                                        str += "</div>";
+                                        str += "<div>";
+                                        str += amsterdam[i].description;
+                                        str += "</div>";
+                                        str += "</div>";
+
+                                        str += '<div class="container col-12"><br/>';
+                                        str += '<button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal' + amsterdam[i].id + '">More details</button>&emsp; &emsp;';
+                                        str += `<button type="button" class="btn btn-info btn-lg" onclick="location.href='PaymentPage.html',takeIDofAppartment('${amsterdam[i].id}')">Book now</button>&emsp; &emsp;`;
+                                        str += `<button type="button" class="btn btn-info btn-lg" onclick="addToFavorites('${amsterdam[i].id}')">Add to favoriets</button>`;
+
+                                        str += '<div class="modal fade" id="myModal' + amsterdam[i].id + '" role="dialog">';
+                                        str += '<div class="modal-dialog">';
+                                        str += '<div class="modal-content">';
+                                        str += '<div class="modal-header">';
+                                        str += '<h4 class="modal-title"><b>More information</b></h4>';
+                                        str += '<button type="button" class="close" data-dismiss="modal">&times;</button>';
+                                        str += '</div>';
+                                        str += '</div>';
+                                        str += '<div class="modal-body">';
+                                        str += '<br/><p><b>Host name: </b></p> ' + amsterdam[i].host_name + '<br/>';
+                                        str += '<br/><p><b>Location: </b></p>' + amsterdam[i].host_location + '<br/>';
+                                        str += '<br/><b><p>Price: </b></p>' + amsterdam[i].price + '<br/>';
+                                        str += '<br/><p><b>About:</b> </p>' + amsterdam[i].host_about + '<br/>';
+                                        str += '<br/><p><b>Type of apartment: </b></p>' + amsterdam[i].property_type + '<br/>';
+                                        str += '<br/><p><b>Services included in the price:</b></p><br/>';
+                                        str += amsterdam[i].amenities.replace('[', "").replace("]", "").replaceAll('"', "");
+                                        str += '</div><div class="modal-footer">';
+                                        str += '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div></div></div></div></div>';
+
+                                        document.getElementById("showRooms").innerHTML += str;
+
+                                        roomNum++;
+
+                                    }
+
+                                }
+
+
+
+                            }
+
+                        }
+
+                    }
+
+
+                }
+                if (roomNum == 0) {
+                    alert("Oops, no apartments were found");
+                }
+                }
+
+          
+
+        }
+
+        //פונקציה שמוסיפה דירות למועדפים של המשתמש
+        function addToFavorites(id) {
+            var isinFav = 0;
+            for (var i = 0; i < cgroup57.users[cgroup57_login.login_user].favorites.length; i++) {
+                if (cgroup57.users[cgroup57_login.login_user].favorites[i] == id) {
+                    isinFav = 1;
+                }
+            }
+            if (isinFav == 1) {
+                alert("Great! The appartmens already exiest in your favorites");
+            }
+            else {
+                alert('The apartment was successfully added to the favorites list');
+                cgroup57.users[cgroup57_login.login_user].favorites.push(id);
+                localStorage["cgroup57"] = JSON.stringify(cgroup57);
+            }
+        }
+
+        //פונקציה שבודקת את התאריכים הפנויים
+        function AvailbleDates(id, startDate, endDate) {
+            var checkPoint = 0;
+
+            if (cgroup57.allRentedAppOB != undefined) {
+                if (cgroup57.allRentedAppOB[id] != undefined) {
+                    if (cgroup57.allRentedAppOB[id].startDate <= startDate && cgroup57.allRentedAppOB[id].endDate >= startDate) {
+                        checkPoint = 1;
+                    }
+                    else if (cgroup57.allRentedAppOB[id].startDate <= endDate && cgroup57.allRentedAppOB[id].endDate >= endDate) {
+                        checkPoint = 1;
+
+                    } else if (cgroup57.allRentedAppOB[id].startDate >= startDate && cgroup57.allRentedAppOB[id].endDate <= endDate) {
+                        checkPoint = 1;
+                    }
+                }
+
+            }
+            return checkPoint;
+        }
+
+        //לקיחת מספר ID של דירה
+        function takeIDofAppartment(id) {
+            cgroup57_login.ap_id = id;
+            localStorage["cgroup57_login"] = JSON.stringify(cgroup57_login);
+        }
+
+    </script>
+
+</head>
+<body class="background_img" onload="initAfterRegistration()">
+
+    <div>
+        <label id="asd"></label>
+    </div>
+    <header class="header">
+
+        <a href="HomePage.html" class="logo">AirBnB</a>
+
+        <input class="side-menu" type="checkbox" id="side-menu" />
+
+        <label class="hamb" for="side-menu">
+            <span class="hamb-line"></span>
+        </label>
+
+        
+
+        <nav class="nav">
+            <ul class="menu">
+                <li class="nav-item"><a class="nav-link scrollto active" href="HomePage.html">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="LoginPage.html">Log Out</a></li>
+                <li class="nav-item"><a class="nav-link" href="MyReservationsPage.html">My reservation</a></li>
+                <li class="nav-item"><a class="nav-link" href="MyFavoritesPage.html">Favorites</a></li>
+            </ul>
+        </nav>
+    </header>
+    </br>
+    </br>
+
+   
+    <div class="container HomePge">
+        <div class="row">
+            <div class="card col-lg-5">
+                <div class="card-body">
+                    <h2>Book now !</h2>
+
+                    <div class="d-none d-md-block col-md TXTbook">
+                        <h4>Homes, hotels and more on Airbnb</h4>
+                    </div>
+                    </br>
+
+                    <form>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class=" col-sm-6">
+                                    <div id="mindiv" for="min-price" class="form-label"><b>Min price: 0 $</b></div>
+                                    <input type="range" class="form-range " min="0" max="1000" id="min-price" step="1" value="0" onchange="minFunc()">
+                                </div>
+                                <div class=" col-sm-6">
+                                    <div id="maxdiv" for="max-price" class="form-label"><b>Max price: 1000 $</b></div>
+                                    <input type="range" class="form-range " min="0" max="1000" id="max-price" step="1" value="1000" onchange="maxFunc()">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+
+
+                    <div class="row">
+                        <div class="input-group-prepend col">
+                            <label class="col">Check in</label>
+                            <label class="col">Check out</label>
+
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="input-group-prepend col">
+                            <input class="form-control" id="startDate" type="date" placeholder="dd/mm/yyyy" name="checkin" />
+                            &emsp; &emsp;
+                            <input class="form-control" id="endDate" type="date" placeholder="dd/mm/yyyy" name="checkout" />
+
+                        </div>
+                    </div>
+                    </br>
+
+
+                    <div class="row">
+                        <div id="roomsdiv" class="col-6 form-group">
+                            <label for="rate">Number of rooms</label>
+
+                        </div>
+
+                        <div class="col-6 form-group">
+                            <label for="rate">Rate</label>
+                            <select onchange="rateFunc()" class="custom-select mb-3 col" id="rate">
+                                <option value="-1">Select</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                        </div>
+                    </div>
+                    <a class="btn btn-danger btn-block" onclick="render()">Search</a>
+                </div>
+            </div>
+        </div>
+        <div class="col" id="showRooms"></div>
+    </div>
+</body>
+</html>

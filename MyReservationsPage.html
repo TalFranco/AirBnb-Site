@@ -1,0 +1,175 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My reservations</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script src="amsterdam.js"></script>
+
+    <link href="LoginPageSTYLE.css" rel="stylesheet" />
+    <link href="HomePageSTYLE.css" rel="stylesheet" />
+
+
+    <script>
+
+        console.log(amsterdam);
+
+        //אתחול
+        function initAfterRegistration() {
+            cgroup57 = JSON.parse(localStorage["cgroup57"]);
+            cgroup57_login = JSON.parse(localStorage["cgroup57_login"]);
+
+        }
+
+        //ביטול הזמנה של דירה
+        function cancleMyReservation(id) {
+
+            let areYouSure = confirm("Are you sure you want to cancel the reservation?");
+            if (areYouSure) {
+                let reservations = cgroup57.users[cgroup57_login.login_user].rented;
+                if (reservations[id] != undefined) {
+                    delete reservations[id];
+                }
+
+                let rentedOB = cgroup57.allRentedAppOB;
+                if (rentedOB[id] != undefined) {
+                    delete rentedOB[id];
+                }
+
+                localStorage["cgroup57"] = JSON.stringify(cgroup57);
+                document.getElementById("myRes").innerHTML = "";
+                showMyReservations();
+            }
+        }
+
+        //הצגת הדירות השכורות של כל משתמש
+        function showMyReservations() {
+
+            var check = 1;
+            for (k in cgroup57.users[cgroup57_login.login_user].rented) {
+                if (cgroup57.users[cgroup57_login.login_user].rented[k] != null) {
+                    for (var i = 0; i < amsterdam.length; i++) {
+                        if (amsterdam[i].id == k) {
+
+                            let str = "<div class='airbnb col-12'>";
+                            str += "<div class='col-12'>";
+                            str += "<div ><h3>" + amsterdam[i].name + "</h3>";
+                            str += `<img src='` + amsterdam[i].picture_url + `'class="roomImg"/>`;
+                            str += "</div>";
+                            str += "<div>";
+                            str += "Asset's id is " + amsterdam[i].id;
+                            str += "</div>";
+                            str += "<div>";
+                            str += '<a href="' + amsterdam[i].listing_url + '"+ target=`_blank`>';
+                            str += " Asset's website ";
+                            str += '</a>';
+                            str += "</div>";
+                            str += "<div>";
+                            str += amsterdam[i].description;
+                            str += "</div>";
+                            str += "</div>";
+                            str += '<h4><b>Check in : </b>' + cgroup57.users[cgroup57_login.login_user].rented[k].startDate + ',<b> Check out : </b>' + cgroup57.users[cgroup57_login.login_user].rented[k].endDate + '</h4>';
+                            str += '<div class="container col-12"><br/>';
+                            str += '<button type="button" class="btn btn-info btn-lg" onclick="cancleMyReservation(' + amsterdam[i].id + ')">Cancle my reservation</button>&emsp;&emsp;';
+                            str += '<button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal' + amsterdam[i].id + '">More details</button>';
+                            str += '<div class="modal fade" id="myModal' + amsterdam[i].id + '" role="dialog">';
+                            str += '<div class="modal-dialog">';
+                            str += '<div class="modal-content">';
+                            str += '<div class="modal-header">';
+                            str += '<h4 class="modal-title"><b>More information</b></h4>';
+                            str += '<button type="button" class="close" data-dismiss="modal">&times;</button>';
+                            str += '</div>';
+                            str += '</div>';
+                            str += '<div class="modal-body">';
+                            str += '<br/><p><b>Host name: </b></p> ' + amsterdam[i].host_name + '<br/>';
+                            str += '<br/><p><b>Location: </b></p>' + amsterdam[i].host_location + '<br/>';
+                            str += '<br/><b><p>Price: </b></p>' + amsterdam[i].price + '<br/>';
+                            str += '<br/><p><b>About:</b> </p>' + amsterdam[i].host_about + '<br/>';
+                            str += '<br/><p><b>Type of apartment: </b></p>' + amsterdam[i].property_type + '<br/>';
+                            str += '<br/><p><b>Services included in the price:</b></p><br/>';
+                            str += amsterdam[i].amenities.replace('[', "").replace("]", "").replaceAll('"', "");
+                            str += '</div><div class="modal-footer">';
+                            str += '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div></div></div></div></div>';
+
+                            document.getElementById("myRes").innerHTML += str;
+
+                            check = 0;
+                        }
+                    }
+                }
+            }
+            if (check == 1) {
+                let str = "<div class='pt-5'>";
+                str += '<div class="container favPage">';
+                str += '<div class="row">';
+                str += '<div class="col-md-5 mx-auto">';
+                str += '<div class="card card-body">';
+                str += '<form id="submitForm"  data-parsley-errors-messages-disabled="true" _lpchecked="1">';
+                str += '<input type="hidden" name="_csrf" value="7635eb83-1f95-4b32-8788-abec2724a9a4">';
+                str += '<div class="form-group pt-1">';
+                str += '<h3>No rented apartments yet</h3>';
+                str += '</br>';
+                str += '</br>';
+                str += `<button class="btn btn-primary btn-block" type="button" onclick="location.href ='HomePage.html'">Back to home page</button>`;
+                str += '</div>';
+                str += '</form>';
+                str += '</div>';
+                str += '</div>';
+                str += '</div>';
+                str += '</div>';
+                str += '</div>';
+
+                document.getElementById("myRes").innerHTML += str;
+
+            }
+
+        }
+
+    </script>
+
+</head>
+<body class="background_img" onload="initAfterRegistration(),showMyReservations()">
+
+
+    <header class="header">
+        <!-- Logo -->
+        <a href="HomePage.html" class="logo">AirBnB</a>
+        <!--<img class="logo" id="airlogo" src="images/Airbnb_Logo_1.png" />-->
+
+
+        <!-- Hamburger icon -->
+        <input class="side-menu" type="checkbox" id="side-menu" />
+        <label class="hamb" for="side-menu"><span class="hamb-line"></span></label>
+
+        <!-- Menu -->
+        <nav class="nav">
+            <ul class="menu">
+                <li class="nav-item"><a class="nav-link scrollto active" href="HomePage.html">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="LoginPage.html">Log Out</a></li>
+                <li class="nav-item"><a class="nav-link" href="MyReservationsPage.html">My reservation</a></li>
+                <li class="nav-item"><a class="nav-link" href="MyFavoritesPage.html">Favorites</a></li>
+            </ul>
+        </nav>
+    </header>
+    </br>
+    </br>
+
+
+    <div class="container">
+        <h1>MY RESERVATION</h1>
+
+        <div class="col" id="myRes"></div>
+
+    </div>
+
+
+
+
+</body>
+</html>

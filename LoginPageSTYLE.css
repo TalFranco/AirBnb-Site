@@ -1,0 +1,38 @@
+﻿body {
+   font-family: 'Muli', sans-serif;
+}
+
+h1 {
+    color: #fff;
+    padding-bottom: 2rem;
+    font-weight: bold;
+}
+
+a {
+    color: #FF385C;
+}
+
+
+    a:hover {
+        color: lightpink;
+        text-decoration: none;
+    }
+
+.form-control:focus {
+    color: #000;
+    background-color: white;
+    border: 2px solid #FF385C;
+    outline: 0;
+    box-shadow: none;
+}
+
+.btn {
+    background: #FF385C;
+    border: #FF385C;
+}
+
+    .btn:hover {
+        background: lightpink;
+        border: lightpink;
+    }
+
